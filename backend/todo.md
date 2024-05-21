@@ -1,13 +1,5 @@
 
 
-=> wishlist
-
-
-- get => Done
-- add => Done
-- remove => Done
-- clear => Done
-
 
 => cart => Done
 
@@ -17,3 +9,6 @@
 - add => Done
 - remove => Done
 - clear   => Done
+
+
+## Done ##
