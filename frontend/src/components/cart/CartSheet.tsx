@@ -19,21 +19,21 @@ import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { fetcher } from "@/lib/utils";
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "sonner";
-// import { toast } from "sonner";
-// import { Spinner } from "../Spinner";
+import { ICartItem } from "@/typings";
 
-// interface ICartDate {
-//   cart: {
-//     books: IBook;
-//   };
-//   totalPrice: number;
-// }
 
 const CartSheet = ({ children }: { children?: React.ReactNode }) => {
   const { authUser } = useAuthContext();
   const userId = authUser?.id;
   const useQueryVariable = useQueryClient();
-  const { data, isLoading,error } = useQuery({
+
+
+
+
+
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, isLoading } = useQuery<any>({
     queryKey: ["Car-UserCart", userId],
     queryFn: () => fetcher("http://localhost:5000/api/cart/"),
     // refetchOnWindowFocus: false,
@@ -75,11 +75,13 @@ const CartSheet = ({ children }: { children?: React.ReactNode }) => {
         {cartItems?.length > 0 ? (
           <div className="relative p-1 h-[90%]">
             <div className="overflow-auto  h-[70%] mt-1  p-1">
-              {cartItems?.map((cartItem) => (
+              {cartItems?.map((cartItem:ICartItem) => (
                 <CartItem
                   key={cartItem.carId}
                   data={cartItem}
                   userId={userId as string}
+                  setRefetch={()=>false}
+                  
                 />
               ))}
             </div>

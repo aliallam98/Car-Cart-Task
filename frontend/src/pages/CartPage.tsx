@@ -16,7 +16,8 @@ const CartPage = () => {
   const userId = authUser?.id;
 
   const [isLoading, setIsLoading] = useState(false);
-  const [cart, setCart] = useState([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [cart, setCart] = useState<any>([]);
   const [refetch, setRefetch] = useState(false);
 
   useEffect(() => {
@@ -81,7 +82,7 @@ const CartPage = () => {
         <>
           <div className="container py-10 grid md:grid-cols-2 gap-10">
             {cars?.map((car: ICar) => (
-              <CartItem data={car} userId={userId!} setRefetch={setRefetch} />
+              <CartItem data={car} userId={userId!} setRefetch={setRefetch} key={car.carId.carName} />
             ))}
           </div>
           <Button

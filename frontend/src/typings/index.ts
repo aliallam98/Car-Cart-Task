@@ -43,7 +43,7 @@ export interface ICar {
   };
 }
 export interface ICartItem {
-  bookId: string;
+  carId: string;
   _id: string;
   name: string;
   coverImage: IImage;
