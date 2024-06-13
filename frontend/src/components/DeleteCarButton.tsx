@@ -7,37 +7,27 @@ import { useQueryClient } from "react-query";
 
 interface IProps {
   carId: string;
-  quantity?: number;
-  className?: string;
-  showIcon?: boolean;
 }
 
-const AddToCartButton = ({carId, quantity = 1 }: IProps) => {
+const DeleteCarButton = ({ carId }: IProps) => {
   const useQueryVariable = useQueryClient();
   const { authUser } = useAuthContext();
-  const userId = authUser?.id;
 
-  
-
-  const addToCartHandler = async () => {
+  const deleteHandler = async () => {
     if (!authUser) return;
 
     await axios
-      .post(
-        "http://localhost:5000/api/cart",
-        { carId, quantity },
-        {
-          withCredentials: true,
-          headers:{
-            authorization: `${authUser}` 
-          }
-        }
-      )
+      .delete(`http://localhost:5000/api/car/${carId}`, {
+        withCredentials: true,
+        headers: {
+          authorization: `${authUser}`,
+        },
+      })
       .then((res) => {
         if (res.data.success) {
-          toast.success("Product added To Cart .");
+          toast.success("Car Deleted.");
           useQueryVariable.invalidateQueries({
-            queryKey: ["UserCart", userId],
+            queryKey: ["Cars"],
           });
         }
       })
@@ -45,12 +35,12 @@ const AddToCartButton = ({carId, quantity = 1 }: IProps) => {
   };
   return (
     <button
-      onClick={addToCartHandler}
-      className=" px-6 py-2  bg-heavyBlueColor text-white uppercase border-r font-bold"
+      onClick={deleteHandler}
+      className=" px-6 py-2  bg-heavyBlueColor text-white  "
     >
-      buy
+      Delete
     </button>
   );
 };
 
-export default AddToCartButton;
+export default DeleteCarButton;

@@ -1,13 +1,38 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import CarCard from "@/components/CarCard";
-import carData from "../constants/car-data";
 import CommonSection from "@/components/CommonSection";
 import Helmet from "@/components/Helmet/Helmet";
 import { useState } from "react";
+import { useQuery } from "react-query";
+import axios from "axios";
+import { ICarInterface } from "@/typings";
+import { FaSpinner } from "react-icons/fa";
 
 const CarsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("");
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["Cars"],
+    queryFn: () =>
+      axios.get("http://localhost:5000/api/car", {
+        withCredentials: true,
+        headers: {
+          authorization: JSON.parse(
+            localStorage.getItem("Car-Showroom-jwt") as string
+          ),
+        },
+      }),
+  });
+
+  if (isLoading || !data) {
+    return (
+      <div className="min-h-[600px] grid place-content-center">
+        <FaSpinner className="animate-spin" />
+      </div>
+    );
+  }
+  const cars = data.data.results || [];
 
   // Filter cars based on search query
   // const filteredCars = carData.filter((car) =>
@@ -21,12 +46,12 @@ const CarsPage = () => {
   };
 
   // Filter and sort cars based on search query and sort option
-  const filteredAndSortedCars = carData
-    .filter((car) =>
+  const filteredAndSortedCars = cars
+    .filter((car: ICarInterface) =>
       car.carName.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .slice() // Create a copy to prevent mutating the original array
-    .sort((a, b) => {
+    .sort((a: any, b: any) => {
       if (sortOption === "low") {
         return a.price - b.price;
       } else if (sortOption === "high") {
@@ -53,7 +78,11 @@ const CarsPage = () => {
                 <i className="ri-sort-asc"></i> Sort By
               </span>
 
-              <select value={sortOption} onChange={handleSortChange} className="border p-2 w-64">
+              <select
+                value={sortOption}
+                onChange={handleSortChange}
+                className="border p-2 w-64"
+              >
                 <option value="">Select</option>
                 <option value="low">Low to High</option>
                 <option value="high">High to Low</option>
@@ -62,7 +91,7 @@ const CarsPage = () => {
             <div className="flex items-center gap-3 mb-5 ">
               <div className="search__box ml-auto">
                 <input
-                className="border p-2 w-96"
+                  className="border p-2 w-96"
                   type="text"
                   placeholder="Search"
                   value={searchQuery}
@@ -76,8 +105,8 @@ const CarsPage = () => {
             </div>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredAndSortedCars.map((item) => (
-              <CarCard item={item} key={item.id} />
+            {filteredAndSortedCars?.map((item: ICarInterface) => (
+              <CarCard item={item} key={item._id} />
             ))}
           </div>
         </div>

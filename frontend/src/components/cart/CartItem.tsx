@@ -3,15 +3,21 @@ import { Button } from "../ui/button";
 import axios from "axios";
 import { toast } from "sonner";
 import DeleteFromCartButton from "./DeleteFromCartButton";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { useQueryClient } from "react-query";
 
 interface IProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
   userId: string;
-  setRefetch: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const CartItem = ({ data, setRefetch }: IProps) => {
+const CartItem = ({ data }: IProps) => {
   const [quantity, setQuantity] = useState<number>(+data.quantity);
+  const { authUser } = useAuthContext();
+  const userId = authUser?.id;
+  const queryClient = useQueryClient()
+  const carId = data?.carId?._id;
+
 
   useEffect(() => {
     if (quantity !== data.quantity) {
@@ -30,11 +36,9 @@ const CartItem = ({ data, setRefetch }: IProps) => {
         )
         .then((res) => {
           res.data.success && toast.success("Product Updated .");
-          setRefetch(true);
-
-          // queryClient.invalidateQueries({
-          //   queryKey: ["UserCart", userId],
-          // });
+          queryClient.invalidateQueries({
+            queryKey: ["Cart", userId],
+          });
         })
         .catch((error) => toast.error(error.response.data.message));
     }
@@ -44,7 +48,6 @@ const CartItem = ({ data, setRefetch }: IProps) => {
     return <p>loading</p>;
   }
 
-  const carId = data?.carId?.id;
 
   const amountHandler = async (type: string) => {
     // type == "+" ? setQuantity(quantity + 1) : setQuantity(quantity - 1);
@@ -54,6 +57,9 @@ const CartItem = ({ data, setRefetch }: IProps) => {
     });
   };
 
+
+  // console.log(data?.carId?._id) Done 
+  
   return (
     <div className="flex items-center justify-between gap-2 border p-2 mt-2 rounded-2xl">
       <img
@@ -88,7 +94,7 @@ const CartItem = ({ data, setRefetch }: IProps) => {
         </Button>
       </div>
 
-      <DeleteFromCartButton carId={data?.carId?.id} setRefetch={setRefetch}/>
+      <DeleteFromCartButton carId={data?.carId?._id} userId={userId!}/>
 
       <p className="text-xl font-semibold text-nowrap">
         $ {+data?.carId?.price * +data?.quantity}

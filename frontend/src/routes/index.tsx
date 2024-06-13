@@ -1,3 +1,4 @@
+import AdminDashboardLayout from "@/components/layouts/AdminDashboardLayout";
 import MainLayout from "@/components/layouts/MainLayout";
 import AboutPage from "@/pages/AboutPage";
 import CarDetailsPage from "@/pages/CarDetailsPage";
@@ -7,6 +8,10 @@ import ContactPage from "@/pages/ContactPage";
 import HomePage from "@/pages/HomePage";
 import LoginPage from "@/pages/LoginPage";
 import SignUpPage from "@/pages/SignUpPage";
+import AddNewCarPage from "@/pages/dashboard/DashboardAddNewCarPage";
+import DashboardBookingsPage from "@/pages/dashboard/DashboardBookingsPage";
+import DashboardCarsPage from "@/pages/dashboard/DashboardCarsPage";
+import EditCarPage from "@/pages/dashboard/DashboardEditCarPage";
 import { createBrowserRouter } from "react-router-dom";
 
 /**
@@ -14,7 +19,7 @@ import { createBrowserRouter } from "react-router-dom";
  * These routes do not require authentication
  * @type {string[]}
  */
-export const publicRoutes = ["/", "/cars", "/cars/:slug", "/about", "/contact"];
+export const publicRoutes = ["/", "/cars", "/cars/:slug", "/about", "/contact","/cart"];
 
 /**
  * An array of routes that are used for authentication
@@ -55,7 +60,7 @@ export const router = createBrowserRouter([
         element: <CarsPage />,
       },
       {
-        path: "/cars/:slug",
+        path: "/cars/:id",
         element: <CarDetailsPage />,
       },
       {
@@ -72,18 +77,30 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  // {
-  //   path: "/",
-  //   element: <AuthLayout />,
-  //   children: [
-  //     {
-  //       path: "/login",
-  //       element: <LoginPage />,
-  //     },
-  //     {
-  //       path: "/signup",
-  //       element: <SignUpPage />,
-  //     },
-  //   ],
-  // },
+  {
+    path: "/",
+    element: <AdminDashboardLayout />,
+    children: [
+      {
+        path: "/dashboard",
+        element: <h1>Dashboard</h1>,
+      },
+      {
+        path: "/dashboard/cars",
+        element: <DashboardCarsPage/>,
+      },
+      {
+        path: "/dashboard/cars/add",
+        element: <AddNewCarPage/>,
+      },
+      {
+        path: "/dashboard/cars/:id/edit",
+        element: <EditCarPage/>,
+      },
+      {
+        path: "/dashboard/bookings",
+        element: <DashboardBookingsPage />,
+      },
+    ],
+  },
 ]);

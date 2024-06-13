@@ -7,7 +7,6 @@ const userSchema = new Schema(
     password: { type: String, required: true },
     profilePicture: String,
     address: String,
-    wishList: [{ type: Types.ObjectId, ref: "Book" }],
     role: { type: "String", enum: ["user", "admin"], default: "user" },
   },
   {

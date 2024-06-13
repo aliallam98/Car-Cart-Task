@@ -6,7 +6,7 @@ import NavLink from "./NavLink";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { ClockIcon } from "@radix-ui/react-icons";
 import { BiPlanet } from "react-icons/bi";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const { authUser } = useAuthContext();
@@ -31,17 +31,15 @@ const Navbar = () => {
               </p>
             </div>
           </div>
-          <div className="flex items-center  gap-4">
+
+        </div>
+        <div className="flex items-center  gap-4">
             <ClockIcon className="size-12" />
             <div className="space-y-2">
               <h3 className="font-semibold text-xl">Sunday to Friday</h3>
               <p className="font-semibold text-lg">10am - 7pm</p>
             </div>
           </div>
-        </div>
-        <button className="px-6 py-2 bg-heavyBlueColor text-white text-sm rounded-md">
-          <Link to={"/contact"}>Request A Call</Link>
-        </button>
         {/* Action Logged in - logged out */}
       </div>
       <nav className="w-full flex items-center justify-between  bg-heavyBlueColor p-4">

@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 
 import { DEFAULT_LOGIN_REDIRECT, authRoutes, publicRoutes } from "@/routes";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+// import { useState } from "react";
 
 interface Decoded {
   email: string;
@@ -20,23 +21,28 @@ interface IProps {
 
 const AuthMiddleware = ({ children }: IProps) => {
   const { pathname } = useLocation();
+  const { authUser, setIsAdmin, isAdmin } = useAuthContext();
+  // const [isAdminState] = useState(isAdmin);
 
-  const { authUser } = useAuthContext();
-
-  const isLoggedIn = !!authUser  //Return true | false
+  const isLoggedIn = !!authUser && Object.keys(authUser).length > 0; //Return true | false
+  // let isAdmin = false;
   const isPublicRoute =
-    publicRoutes.includes(pathname) || pathname.startsWith("/cars");
+    publicRoutes.includes(pathname) || pathname.startsWith("/book");
   const isAuthRoute = authRoutes.includes(pathname);
+  const isDashboardRoute = pathname.startsWith("/dashboard");
 
-  console.log("isLoggedIn", isLoggedIn);
+  // console.log(pathname);
+
+  // console.log("isLoggedIn", isLoggedIn);
+  // console.log("isPublicRoute", isPublicRoute);
+  // console.log("isAuthRoute", isAuthRoute);
 
   let expirationTime = 0;
   const currentTime = Date.now();
-
+  const decoded: Decoded | null = authUser && Object.keys(authUser).length ? jwtDecode(`${authUser}`) : null; // Explicitly type 'Decoded'
   if (authUser && Object.keys(authUser).length) {
     // console.log("Error");
 
-    const decoded: Decoded = jwtDecode(`${authUser}`) || null; // Explicitly type 'Decoded'
 
     if (decoded) {
       expirationTime = decoded.exp * 1000;
@@ -44,6 +50,8 @@ const AuthMiddleware = ({ children }: IProps) => {
       if (currentTime > expirationTime) {
         return <Navigate to={"/login"} />;
       }
+      // isAdmin = decoded.role !== "user" ? true : false
+      setIsAdmin(decoded.role !== "user");
     }
   }
 
@@ -55,11 +63,17 @@ const AuthMiddleware = ({ children }: IProps) => {
   }
 
   if (!isLoggedIn && !isPublicRoute) {
+    console.log("33333333333333333333333");
+
+    console.log(isLoggedIn, isDashboardRoute, !isAdmin);
     return <Navigate to={"/login"} />;
   }
-  // if (isLoggedIn && !isPublicRoute) {
-  //   return <Navigate to={"/"} />;
-  // }
+
+  if (isLoggedIn && isDashboardRoute && decoded?.role == "user" ) {
+
+
+    return <Navigate to={"/"} />;
+  }
 
   return children;
 };

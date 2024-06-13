@@ -7,13 +7,12 @@ const auth = (roles = []) => {
     try {
       const token = await req.headers.authorization;
 
-      // console.log(req.cookies);
-      console.log("token", token);
+
       if (!token) {
         return next(new ErrorClass("Authorization Is Required", 401));
       }
 
-      const decoded = verifyToken({ token: `${token}` });
+      const decoded = verifyToken({ token: `${token}` });  
 
       if (!decoded?.id) {
         return next(new ErrorClass("Invalid Payload Data", 401));

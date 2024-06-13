@@ -1,24 +1,33 @@
 import ErrorClass from "../../utils/ErrorClass.js";
 import cartModel from "../../DB/models/Cart.model.js";
 import { asyncHandler } from "../../utils/errorHandling.js";
+import carModel from "../../DB/models/Car.Model.js";
 
 //
 export const addToCart = asyncHandler(async (req, res, next) => {
-  const { carId, quantity, data } = req.body;
+  const { carId, quantity } = req.body;
+
+
+  const car = await carModel.findById(carId);
+
+  if (!car) {
+    return next(new ErrorClass("This car Is Not Found ", 404));
+  }
 
   const cart = await cartModel.findOne({ userId: req.user._id });
 
-  const carIndex = cart.cars.findIndex(
-    (ele) => ele.carId.id.toString() == carId
-  );
+  const carIndex = cart.cars.findIndex((ele) => ele.carId.toString() == carId);
+
+
   if (carIndex == -1) {
     cart.cars.push({
-      carId: data,
+      carId,
       quantity,
     });
   } else {
     cart.cars[carIndex].quantity = quantity;
   }
+
 
   cart.save();
   return res
@@ -27,21 +36,18 @@ export const addToCart = asyncHandler(async (req, res, next) => {
 });
 
 export const deleteFromCart = asyncHandler(async (req, res, next) => {
-  console.log("deleteeeeeee");
-  console.log(req.params.id);
-  const cart = await cartModel.findOne({
-    userId: req.user._id,
-  });
-  if (!cart) {
-    return next(new ErrorClass("This cart Is Not Found ", 404));
+  const car = await carModel.findById(req.params.id);
+
+  if (!car) {
+    return next(new ErrorClass("This car Is Not Found ", 404));
   }
 
-  const cartToUpdate = await cartModel.findOneAndUpdate(
+  const cart = await cartModel.findOneAndUpdate(
     { userId: req.user._id },
     {
       $pull: {
         cars: {
-          "carId.id": req.params.id,
+          carId: req.params.id,
         },
       },
     }
@@ -49,11 +55,7 @@ export const deleteFromCart = asyncHandler(async (req, res, next) => {
 
   res
     .status(200)
-    .json({
-      success: true,
-      message: `car deleted from cart`,
-      results: cartToUpdate,
-    });
+    .json({ success: true, message: `car ${car.carName} deleted from cart` });
 });
 
 //
@@ -74,21 +76,17 @@ export const clearAllCart = asyncHandler(async (req, res, next) => {
 });
 
 export const getUserCart = asyncHandler(async (req, res, next) => {
-  console.log("1");
+  const cart = await cartModel.findOne({ userId: req.user._id }).populate([
+    {
+      path: "cars.carId",
+    },
+  ]);
 
-  const cart = await cartModel.findOne({ userId: req.user._id }).populate();
-
-  console.log("2", cart);
-  console.log("2");
-
-  // console.log("cart",cart);
   if (!cart.cars.length) {
     return res
       .status(200)
       .json({ success: true, message: "Done", results: [] });
   }
-
-  console.log("3");
 
   let totalPrice = 0;
   cart.cars = cart.cars.filter((ele) => {
@@ -98,8 +96,6 @@ export const getUserCart = asyncHandler(async (req, res, next) => {
     }
   });
   cart.save();
-
-  console.log("4");
 
   return res
     .status(200)

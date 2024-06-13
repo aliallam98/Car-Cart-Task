@@ -10,18 +10,9 @@ const cartSchema = new Schema(
     cars: [
       {
         carId: {
-          id: { type: String },
-          brand: { type: String },
-          rating: { type: String },
-          carName: { type: String },
-          imgUrl: { type: String },
-          model: { type: String },
-          price: { type: String },
-          speed: { type: String },
-          gps: { type: String },
-          seatType: { type: String },
-          automatic: { type: String },
-          description: { type: String },
+          type: Types.ObjectId,
+          ref: "Car",
+          required: true,
         },
         quantity: { type: Number, default: 1 },
       },
